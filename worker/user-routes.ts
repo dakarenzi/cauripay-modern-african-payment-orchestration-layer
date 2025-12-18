@@ -5,6 +5,7 @@ import { ok, bad, isStr } from './core-utils';
 import type { PaymentRequest, Transaction } from "@shared/types";
 export function userRoutes(app: Hono<{ Bindings: Env }>) {
   app.get('/api/stats', async (c) => {
+    await TenantEntity.ensureSeed(c.env);
     await TransactionEntity.ensureSeed(c.env);
     const stats = await TransactionEntity.getStats(c.env);
     return ok(c, stats);

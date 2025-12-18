@@ -7,6 +7,7 @@ import { formatXOF } from '@/lib/currency';
 import { TrendingUp, Users, CreditCard, CheckCircle2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import type { DashboardStats } from '@shared/types';
+import { cn } from "@/lib/utils";
 export function DashboardPage() {
   const { data: stats, isLoading } = useQuery<DashboardStats>({
     queryKey: ['stats'],
@@ -52,7 +53,7 @@ export function DashboardPage() {
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats?.successRate.toFixed(1)}%</div>
+              <div className="text-2xl font-bold">{stats?.successRate?.toFixed(1) ?? '0.0'}%</div>
               <p className="text-xs text-muted-foreground mt-1">Industry avg: 92%</p>
             </CardContent>
           </Card>
@@ -97,22 +98,22 @@ export function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {stats?.recentActivity.map((tx) => (
-                  <div key={tx.id} className="flex items-center gap-4">
+                {stats?.recentActivity?.map((tx, index) => (
+                  <div key={tx.id || `tx-${index}`} className="flex items-center gap-4">
                     <div className={cn(
                       "h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold",
                       tx.provider === 'WAVE' ? "bg-blue-100 text-blue-600" : "bg-orange-100 text-orange-600"
                     )}>
-                      {tx.provider[0]}
+                      {tx.provider?.[0] || '?'}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold">{tx.customerPhone}</p>
-                      <p className="text-xs text-muted-foreground">{tx.country} • {tx.provider}</p>
+                      <p className="text-sm font-semibold">{tx.customerPhone || 'N/A'}</p>
+                      <p className="text-xs text-muted-foreground">{tx.country || '??'} • {tx.provider || '???'}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold">{formatXOF(tx.amount)}</p>
-                      <p className={cn("text-2xs font-medium", tx.status === 'SUCCESS' ? "text-emerald-600" : "text-red-600")}>
-                        {tx.status}
+                      <p className="text-sm font-bold">{formatXOF(tx.amount || 0)}</p>
+                      <p className={cn("text-2xs font-medium", (tx.status || '') === 'SUCCESS' ? "text-emerald-600" : "text-red-600")}>
+                        {tx.status || 'PENDING'}
                       </p>
                     </div>
                   </div>

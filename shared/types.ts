@@ -1,3 +1,8 @@
+export interface PaginatedResponse<T> {
+  items: T[];
+  nextCursor: string | null;
+}
+
 export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;

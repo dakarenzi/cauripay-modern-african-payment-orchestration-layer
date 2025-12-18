@@ -1,18 +1,28 @@
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { api } from '@/lib/api-client';
 import { formatXOF } from '@/lib/currency';
+import { cn } from '@/lib/utils';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { Transaction } from '@shared/types';
+import type { PaginatedResponse, Transaction } from '@shared/types';
 export function TransactionsPage() {
-  const { data, isLoading } = useQuery<{ items: Transaction[] }>({
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isPending } = useInfiniteQuery<PaginatedResponse<Transaction>>({
     queryKey: ['transactions'],
-    queryFn: () => api<{ items: Transaction[] }>('/api/transactions'),
+    queryFn: async ({ pageParam = null }) => {
+      const cursor = pageParam ? `?cursor=${pageParam}` : '';
+      return api<PaginatedResponse<Transaction>>(`/api/transactions${cursor}`);
+    },
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
   });
+
+  const transactions = data?.pages.flatMap(page => page.items) ?? [];
   return (
     <DashboardLayout title="Transaction Ledger">
       <Card className="shadow-soft border-none overflow-hidden">
@@ -30,9 +40,12 @@ export function TransactionsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {isPending ? (
               <TableRow><TableCell colSpan={8} className="text-center py-10">Loading transactions...</TableCell></TableRow>
-            ) : data?.items.map((tx) => (
+            ) : !transactions.length && !isPending ? (
+              <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground">No transactions found</TableCell></TableRow>
+            ) : (
+              transactions.map((tx) => (
               <TableRow key={tx.id} className="hover:bg-muted/30 transition-colors">
                 <TableCell className="font-mono text-xs font-bold">{tx.id}</TableCell>
                 <TableCell className="text-xs text-muted-foreground">
@@ -60,13 +73,26 @@ export function TransactionsPage() {
                   </Badge>
                 </TableCell>
               </TableRow>
-            ))}
+              ))
+            )}
           </TableBody>
         </Table>
+        <div className='flex justify-center pt-8'>
+          {hasNextPage && (
+            <Button 
+              variant='outline' 
+              onClick={() => fetchNextPage()} 
+              disabled={isFetchingNextPage}
+            >
+              {isFetchingNextPage ? (
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              ) : (
+                'Load More'
+              )} ({transactions.length} loaded)
+            </Button>
+          )}
+        </div>
       </Card>
     </DashboardLayout>
   );
-}
-function cn(...inputs: any[]) {
-  return inputs.filter(Boolean).join(' ');
 }
