@@ -9,7 +9,6 @@ import { api } from '@/lib/api-client';
 import { toast } from 'sonner';
 import { Smartphone, ArrowRight, Loader2, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
 import type { CountryCode, ProviderCode, Transaction } from '@shared/types';
 export function SimulatorPage() {
   const [loading, setLoading] = useState(false);
@@ -176,4 +175,7 @@ function TraceStep({ active, done, label, sub }: { active: boolean, done: boolea
       </div>
     </div>
   );
+}
+function cn(...inputs: any[]) {
+  return inputs.filter(Boolean).join(' ');
 }
