@@ -1,6 +1,6 @@
 # CauriPay Payment Pro
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/dakarenzi/cauripay-modern-african-payment-orchestration-layer)
 
 A modern full-stack payment processing application built on Cloudflare Workers. This project leverages Durable Objects for scalable, stateful backend entities, paired with a performant React frontend using Tailwind CSS and shadcn/ui components.
 
@@ -106,7 +106,7 @@ This builds frontend assets and deploys the Worker + static site.
 2. `bun build`
 3. `bunx wrangler deploy`
 
-[cloudflarebutton]
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/dakarenzi/cauripay-modern-african-payment-orchestration-layer)
 
 **Notes**:
 - Free tier supports this fully (Durable Objects included).
